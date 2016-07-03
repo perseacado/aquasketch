@@ -228,12 +228,17 @@
                                 <i class="fa fa-circle-o" ng-hide="layer.id == drawing.activeLayer"></i>
                                 <span>{{ layer.name }}</span>
 
-                                <i ng-click="layer.visible = !layer.visible" ng-show="layer.visible" class="text-success pull-right fa fa-eye"></i>
-                                <i ng-click="layer.visible = !layer.visible" ng-hide="layer.visible" class="text-muted pull-right fa fa-eye-slash"></i>
+                                <span class="pull-right">
+                                    <i ng-click="layer.visible = !layer.visible" ng-show="layer.visible"
+                                       class="text-success fa fa-eye"></i>
+                                    <i ng-click="layer.visible = !layer.visible" ng-hide="layer.visible"
+                                       class="text-muted fa fa-eye-slash"></i>
+                                    <i ng-click="removeLayer(layer)" class="fa fa-trash"></i>
+                                </span>
                             </a>
                         </li>
                         <li>
-                            <a ng-click="addLayer()"><i class="fa fa-plus-circle"></i> New Layer</a>
+                            <a href="" ng-click="addLayer()"><i class="fa fa-plus-circle"></i> New Layer</a>
                         </li>
                     </ul>
                 </li>
@@ -248,6 +253,10 @@
                             <a>Width</a>
                         </li>
                     </ul>
+                </li>
+
+                <li>
+                    <a href="" ng-click="resetSketch()"><span>Reset</span></a>
                 </li>
 
                 <!--<li class="treeview">-->
@@ -677,6 +686,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.7/angular-sanitize.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.7/i18n/angular-locale_de-at.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.13.1/lodash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-local-storage/0.2.7/angular-local-storage.min.js"></script>
 <script th:src="@{'/app.js'}" src="../static/app.js"></script>
 
 </body>

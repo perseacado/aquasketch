@@ -1,33 +1,75 @@
 (function (angular, _) {
     'use strict';
 
-    angular.module('aquasketch.app', ['ngSanitize', 'ngTouch', 'aquasketch.components'])
+    angular.module('aquasketch.app', ['ngSanitize', 'ngTouch', 'aquasketch.components', 'aquasketch.services'])
         .constant('_', _);
 })(window.angular, window._);
 
-(function(angular) {
+(function (angular) {
     'use strict';
 
     angular.module('aquasketch.app')
-        .controller('MainController', function ($scope) {
+        .controller('MainController', function ($scope, SketchService, _) {
             var ctrl = $scope;
-            var drawing = ctrl.drawing = {
-                layers: []
-            };
 
             ctrl.addLayer = function () {
                 var layer = {
-                    id: drawing.layers.length,
-                    name: 'Layer' + drawing.layers.length,
+                    id: ctrl.drawing.layers.length,
+                    name: 'Layer' + ctrl.drawing.layers.length,
                     visible: true,
                     lines: []
                 };
-                drawing.layers.push(layer);
-                drawing.activeLayer = layer.id;
+                ctrl.drawing.layers.push(layer);
+                ctrl.drawing.activeLayer = layer.id;
             };
-            ctrl.addLayer();
+
+            ctrl.removeLayer = function (layer) {
+                if (confirm('Sicher?')) {
+                    ctrl.drawing.layers = _.without(ctrl.drawing.layers, layer);
+                }
+            };
+
+            ctrl.resetSketch = function () {
+                if (confirm('Sicher?')) {
+                    ctrl.drawing = {
+                        id: 1,
+                        layers: []
+                    };
+                    ctrl.addLayer();
+                }
+            };
+
+            ctrl.drawing = SketchService.findOne(1);
+            if (!ctrl.drawing) {
+                ctrl.drawing = {
+                    id: 1,
+                    layers: []
+                };
+                ctrl.addLayer();
+            }
+            $scope.$watch('drawing', function (drawing) {
+                SketchService.save(drawing);
+            }, true);
         });
 })(window.angular);
+
+(function (angular) {
+    'use strict';
+
+    angular.module('aquasketch.services', ['LocalStorageModule'])
+        .config(function (localStorageServiceProvider) {
+            localStorageServiceProvider.setPrefix('aquasketch');
+        })
+        .service('SketchService', function (localStorageService) {
+            this.findOne = function (id) {
+                return localStorageService.get(id);
+            };
+            this.save = function (sketch) {
+                localStorageService.set(sketch.id, sketch);
+            };
+        });
+})(window.angular);
+
 
 (function (angular) {
     'use strict';
@@ -51,14 +93,11 @@
                     var nGapsHorizontal = Math.floor(width / gapHorizontal);
 //                            var gapVertical = gapHorizontal * ratio;
                     var gapVertical = gapHorizontal;
-                    var nGapsVertical =Math.floor(height / gapVertical);
-
-                    var drawing = scope.drawing;
-                    var layers = drawing.layers;
+                    var nGapsVertical = Math.floor(height / gapVertical);
 
                     ctx.translate(0.5, 0.5);
 
-                    var repaint = _.throttle(function () {
+                    var repaint = function () {
                         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
                         ctx.lineJoin = 'round';
@@ -80,10 +119,10 @@
                         ctx.lineWidth = 1.0;
                         ctx.lineJoin = 'round';
                         ctx.lineCap = 'round';
-                        _.forEach(layers, function (layer) {
-                            if(!layer.visible) return;
+                        _.forEach(scope.drawing.layers, function (layer) {
+                            if (!layer.visible) return;
                             _.forEach(layer.lines, function (line) {
-                                if(line.points.length) {
+                                if (line.points.length) {
                                     ctx.beginPath();
                                     var points = line.points;
                                     var i;
@@ -104,11 +143,14 @@
                                 }
                             });
                         });
-                    }, 10);
-                    repaint();
+                    };
+                    //repaint();
+                    scope.$watch('drawing', function () {
+                        repaint();
+                    }, true);
 
-                    var layer = function() {
-                        return _.find(drawing.layers, { id: drawing.activeLayer });
+                    var layer = function () {
+                        return _.find(scope.drawing.layers, {id: scope.drawing.activeLayer});
                     };
 
                     var mouseDown = false;
@@ -124,8 +166,9 @@
                             if (e.shiftKey) {
                                 x = startX;
                             }
-                            layer().lines[layer().lines.length-1].points.push([x, y]);
-                            repaint();
+                            scope.$apply(function () {
+                                layer().lines[layer().lines.length - 1].points.push([x, y]);
+                            });
                         }
                     }, 24), false);
                     canvas.addEventListener("mousedown", function (e) {
@@ -133,8 +176,9 @@
                         var rect = canvas.getBoundingClientRect();
                         startX = e.clientX - rect.left;
                         startY = e.clientY - rect.top;
-                        layer().lines.push({ points: [[startX, startY]]});
-                        repaint();
+                        scope.$apply(function () {
+                            layer().lines.push({points: [[startX, startY]]});
+                        });
                     }, false);
                     canvas.addEventListener("mouseup", function (e) {
                         mouseDown = false;
