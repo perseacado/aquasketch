@@ -1,0 +1,28 @@
+spring:
+  thymeleaf:
+    cache: false
+  data:
+    mongodb:
+      host: 192.168.99.100
+      port: 27017
+
+facebook:
+  client:
+    accessTokenUri: https://graph.facebook.com/oauth/access_token
+    userAuthorizationUri: https://www.facebook.com/dialog/oauth
+    tokenName: oauth_token
+    authenticationScheme: query
+    clientAuthenticationScheme: form
+  resource:
+    userInfoUri: https://graph.facebook.com/me
+
+google:
+  client:
+    accessTokenUri: https://accounts.google.com/o/oauth2/token
+    userAuthorizationUri: https://accounts.google.com/o/oauth2/auth
+    tokenName: authorization_code
+    authenticationScheme: query
+    clientAuthenticationScheme: form
+    scope: https://www.googleapis.com/auth/userinfo.email,https://www.googleapis.com/auth/userinfo.profile
+  resource:
+    userInfoUri: https://www.googleapis.com/oauth2/v2/userinfo

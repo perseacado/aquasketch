@@ -2,6 +2,7 @@ package com.github.perseacado.aquasketch.frontend.web
 
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.RequestMapping
+import java.security.Principal
 
 /**
  * @author Marco Eigletsberger, 01.07.16.
@@ -10,7 +11,9 @@ import org.springframework.web.bind.annotation.RequestMapping
 @RequestMapping("/")
 open class IndexController {
 
-    @RequestMapping
-    fun index() = "layout"
-
+    @RequestMapping("/app")
+    fun app(principal: Principal): String {
+        println(principal)
+        return "layout"
+    }
 }

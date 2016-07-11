@@ -1,0 +1,22 @@
+<aside class="main-sidebar">
+    <!-- sidebar: style can be found in sidebar.less -->
+    <section class="sidebar">
+        <ul class="sidebar-menu">
+            <li class="header">Sketches</li>
+
+            <li class="treeview">
+                <a href="" ng-click="ctrl.newSketch()"><i class="fa fa-plus-circle"></i> New Sketch</a>
+            </li>
+        </ul>
+    </section>
+    <!-- /.sidebar -->
+</aside>
+<div class="content-wrapper">
+    <section class="content">
+        <div class="box" ng-repeat="sketch in ctrl.sketches">
+            <div class="box-body" ui-sref="sketch({sketchId: sketch.id})">
+                {{ sketch.name }}
+            </div>
+        </div>
+    </section>
+</div>

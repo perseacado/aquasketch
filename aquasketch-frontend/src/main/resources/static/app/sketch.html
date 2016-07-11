@@ -1,0 +1,72 @@
+<aside class="main-sidebar">
+    <!-- sidebar: style can be found in sidebar.less -->
+    <section class="sidebar">
+        <ul class="sidebar-menu">
+            <li class="treeview">
+                <a href="" ui-sref="list">
+                    <i class="fa fa-fw fa-arrow-left"></i> Back to Sketches
+                </a>
+            </li>
+
+            <li class="header" style="cursor: pointer" ng-click="ctrl.changeName()">
+                {{ ctrl.sketch.name }}
+            </li>
+
+            <li class="active treeview">
+                <a>
+                    <i class="fa fa-list"></i> <span>Layers</span>
+                </a>
+                <ul class="treeview-menu">
+                    <li ng-repeat="layer in ctrl.drawing.layers">
+                        <a ng-click="ctrl.drawing.activeLayer = layer.id">
+                            <i class="fa fa-circle text-success" ng-show="layer.id == ctrl.drawing.activeLayer"></i>
+                            <i class="fa fa-circle-o" ng-hide="layer.id == ctrl.drawing.activeLayer"></i>
+                            <span style="cursor: pointer" ng-click="ctrl.changeLayerName(layer)">{{ layer.name }}</span>
+
+                            <span class="pull-right">
+                                <i ng-click="layer.visible = !layer.visible" ng-show="layer.visible"
+                                   class="text-success fa fa-eye"></i>
+                                <i ng-click="layer.visible = !layer.visible" ng-hide="layer.visible"
+                                   class="text-muted fa fa-eye-slash"></i>
+                                <i ng-click="ctrl.removeLayer(layer)" class="fa fa-trash"></i>
+                            </span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="" ng-click="ctrl.addLayer()"><i class="fa fa-plus-circle"></i> New Layer</a>
+                    </li>
+                </ul>
+            </li>
+
+            <li>
+                <a href="" ng-click="ctrl.sketch.showGrid = !ctrl.sketch.showGrid">
+                    <i ng-show="ctrl.sketch.showGrid" class="text-success fa fa-eye"></i>
+                    <i ng-hide="ctrl.sketch.showGrid" class="text-muted fa fa-eye-slash"></i>
+                    <span ng-show="ctrl.sketch.showGrid">Hide grid</span>
+                    <span ng-hide="ctrl.sketch.showGrid">Show grid</span>
+                </a>
+            </li>
+            <li>
+                <a href="" ng-click="ctrl.resetSketch()"><span>Reset</span></a>
+            </li>
+            <li>
+                <a href="" ngf-select="ctrl.addImage($file)"><i class="fa fa-picture-o"></i> Add Image</a>
+            </li>
+        </ul>
+    </section>
+    <!-- /.sidebar -->
+</aside>
+<div class="content-wrapper">
+    <section class="content">
+        <div class="box">
+            <div class="body no-padding main-sketch">
+                <div as-draw-panel=""
+                     drawing="ctrl.drawing"
+                     style="width: 100%; height: 1000px;"/>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- -->
+<canvas id="canvas-helper" style="display: none; width: 100%; height: 1000px;"></canvas>
