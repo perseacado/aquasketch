@@ -251,31 +251,65 @@
                         return canv;
                     };
 
+                    var isOnLine = function (x1, y1, x2, y2, px, py) {
+                        var dxc = px - x1;
+                        var dyc = py - y1;
+                        var dxl = x2 - x1;
+                        var dyl = y2 - y1;
+                        var cross = dxc * dyl - dyc * dxl;
+                        if (Math.abs(cross) > 50.0)
+                            return false;
+                        if (Math.abs(dxl) >= Math.abs(dyl))
+                            return dxl > 0 ?
+                            x1 <= px && px <= x2 :
+                            x2 <= px && px <= x1;
+                        else
+                            return dyl > 0 ?
+                            y1 <= py && py <= y2 :
+                            y2 <= py && py <= y1;
+                    }
+
                     var deletePointsIn = function (line, x1, y1, x2, y2) {
+                        // console.log("delete points");
                         var newLines = [];
                         var currentLine = {
                             points: []
                         };
                         newLines.push(currentLine);
-                        _.forEach(line.points, function (point) {
-                            if (point[0] >= x1 && point[1] >= y1
-                                && point[0] <= x2 && point[1] <= y2) {
+                        for (var i = 0; i < line.points.length; i++) {
+                            if (i < line.points.length - 1 && isOnLine(
+                                    line.points[i][0], line.points[i][1],
+                                    line.points[i + 1][0], line.points[i + 1][1],
+                                    (x1 + x2) / 2, (y1 + y2) / 2)) {
+                                currentLine.points.push(line.points[i])
                                 currentLine = {
                                     points: []
                                 };
                                 newLines.push(currentLine);
                             } else {
-                                currentLine.points.push(point);
+                                currentLine.points.push(line.points[i]);
                             }
-                        });
+                        }
+
+                        // _.forEach(line.points, function (point) {
+                        //     if (point[0] >= x1 && point[1] >= y1
+                        //         && point[0] <= x2 && point[1] <= y2) {
+                        //         currentLine = {
+                        //             points: []
+                        //         };
+                        //         newLines.push(currentLine);
+                        //     } else {
+                        //         currentLine.points.push(point);
+                        //     }
+                        // });
                         return newLines;
                     };
 
-                    var deletePointsInLayer = function (layer, x1, y1, x2, y2) {
+                    var deletePointsInLayer = _.throttle(function (layer, x1, y1, x2, y2) {
                         layer.lines = _.flatMap(layer.lines, function (line) {
                             return deletePointsIn(line, x1, y1, x2, y2);
                         });
-                    };
+                    }, 100);
 
                     var layer_img_tmp = {};
                     var repaint_layer = function (layer) {
@@ -299,9 +333,16 @@
                                 });
                                 layer_img_tmp[layer.id] = angular.copy(layer.data);
                             }
-
+                            // var odd = false;
                             _.forEach(layer.lines, function (line) {
                                 if (line.points.length) {
+                                    // odd = !odd;
+                                    // var tmpColor = line.color;
+                                    // if(odd) {
+                                    //     ctx.strokeStyle = "#ff0000";
+                                    // } else {
+                                    //     ctx.strokeStyle = "#00ff00";
+                                    // }
                                     ctx.beginPath();
                                     var ps = _.flatMap(line.points, function (point) {
                                         return point;
@@ -309,6 +350,7 @@
                                     ctx.moveTo(ps[0], ps[1]);
                                     ctx.curve(ps, 0.5, 3);
                                     ctx.stroke();
+                                    // ctx.colorStyle = tmpColor;
                                 }
                             });
                         }
@@ -360,7 +402,7 @@
                     var mouseDown = false;
                     var startX, startY, lastX, lastY;
                     elem[0].addEventListener("mousemove", _.throttle(function (e) {
-                        if (scope.drawing.eraser) {
+                        if (scope.drawing.eraser && mouseDown) {
                             var rect = elem[0].getBoundingClientRect();
                             var x = e.clientX - rect.left;
                             var y = e.clientY - rect.top;
@@ -388,9 +430,9 @@
                         }
                     }, 10), false);
                     elem[0].addEventListener("mousedown", function (e) {
+                        mouseDown = true;
                         if (scope.drawing.eraser) {
                         } else {
-                            mouseDown = true;
                             var rect = elem[0].getBoundingClientRect();
                             lastX = startX = e.clientX - rect.left;
                             lastY = startY = e.clientY - rect.top;
@@ -400,9 +442,9 @@
                         }
                     }, false);
                     elem[0].addEventListener("mouseup", function (e) {
+                        mouseDown = false;
                         if (scope.drawing.eraser) {
                         } else {
-                            mouseDown = false;
                             var rect = elem[0].getBoundingClientRect();
                             var x = e.clientX - rect.left;
                             var y = e.clientY - rect.top;
