@@ -1,0 +1,19 @@
+spring:
+  thymeleaf:
+    cache: true
+  data:
+    mongodb:
+      username: ${MONGODB_USERNAME}
+      password: ${MONGODB_PASSWORD}
+      host: ${MONGODB_HOST}
+      port: ${MONGODB_PORT}
+
+facebook:
+  client:
+    clientId: ${FACEBOOK_CLIENT_ID}
+    clientSecret: ${FACEBOOK_CLIENT_SECRET}
+
+google:
+  client:
+    clientId: ${GOOGLE_CLIENT_ID}
+    clientSecret: ${GOOGLE_CLIENT_SECRET}
