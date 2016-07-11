@@ -52,6 +52,11 @@
             <li>
                 <a href="" ngf-select="ctrl.addImage($file)"><i class="fa fa-picture-o"></i> Add Image</a>
             </li>
+            <li ng-class="{ 'active': ctrl.sketch.eraser }">
+                <a href="" ng-click="ctrl.sketch.eraser = !ctrl.sketch.eraser">
+                    <i class="fa fa-eraser" ng-class="{ 'text-success': ctrl.sketch.eraser }"></i> Eraser
+                </a>
+            </li>
         </ul>
     </section>
     <!-- /.sidebar -->
@@ -70,3 +75,9 @@
 
 <!-- -->
 <canvas id="canvas-helper" style="display: none; width: 100%; height: 1000px;"></canvas>
+
+<style>
+    canvas {
+        cursor: pointer;
+    }
+</style>
