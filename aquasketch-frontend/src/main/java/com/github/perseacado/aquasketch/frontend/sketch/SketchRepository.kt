@@ -8,6 +8,6 @@ import org.springframework.data.repository.CrudRepository
  */
 interface SketchRepository : CrudRepository<Sketch, String> {
 
-    @Query("{ 'userId': ?0 }")
-    fun findByUserId(userId: String): List<Sketch>;
+    @Query(value = "{ 'userId': ?0 }", fields = "{ 'id': 1, 'name': 1}")
+    fun findByUserId(userId: String): List<SketchInfo>
 }

@@ -29,3 +29,8 @@ class Layer {
 class Line {
     var points: MutableList<Array<Int>>? = mutableListOf()
 }
+
+class SketchInfo {
+    var id: String? = null
+    var name: String? = null
+}
