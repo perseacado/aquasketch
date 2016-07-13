@@ -1,7 +1,10 @@
 (function (angular, _) {
     'use strict';
 
-    angular.module('aquasketch.app', ['ngSanitize', 'ngFileUpload', 'ngTouch', 'ui.router', 'aquasketch.components', 'aquasketch.services'])
+    angular.module('aquasketch.app', [
+        'ngSanitize',
+        'colorpicker.module',
+        'rzModule', 'ngFileUpload', 'ngTouch', 'ui.router', 'aquasketch.components', 'aquasketch.services'])
         .constant('_', _);
 })(window.angular, window._);
 
@@ -221,7 +224,6 @@
                             var lctx_img = lcanvas_img.getContext("2d");
                             lctx.lineJoin = 'round';
                             lctx.lineCap = 'round';
-                            lctx.lineWidth = 1.30;
                             canv = {
                                 hide: function () {
                                     $(lcanvas).hide();
@@ -256,7 +258,7 @@
                         var dxl = x2 - x1;
                         var dyl = y2 - y1;
                         var cross = dxc * dyl - dyc * dxl;
-                        if (Math.abs(cross) > 150.0)
+                        if (Math.abs(cross) > 50.0)
                             return false;
                         if (Math.abs(dxl) >= Math.abs(dyl))
                             return dxl > 0 ?
@@ -308,7 +310,7 @@
                         layer.lines = _.flatMap(layer.lines, function (line) {
                             return deletePointsIn(line, x1, y1, x2, y2);
                         });
-                    }, 100);
+                    }, 10);
 
                     var layer = function () {
                         return _.find(scope.drawing.layers, {id: scope.drawing.activeLayer});
@@ -341,6 +343,11 @@
                             // var odd = false;
                             _.forEach(layer.lines, function (line) {
                                 if (line.points.length) {
+                                    var pen = line.tools.pen || {
+                                            size: 1.0
+                                        };
+                                    ctx.lineWidth = pen.size || 1.0;
+                                    ctx.strokeStyle = pen.color || '#000000';
                                     // odd = !odd;
                                     // var tmpColor = line.color;
                                     // if(odd) {
@@ -443,7 +450,9 @@
                             lastX = startX = e.clientX - rect.left;
                             lastY = startY = e.clientY - rect.top;
                             scope.$apply(function () {
-                                layer().lines.push({points: [[startX, startY]]});
+                                var line = {points: [[startX, startY]]};
+                                line.tools = angular.copy(scope.drawing.tools);
+                                layer().lines.push(line);
                             });
                         }
                     }, false);

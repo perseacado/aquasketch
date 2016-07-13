@@ -38,6 +38,22 @@
                 </ul>
             </li>
 
+            <li class="active treeview">
+                <a>Pen</a>
+                <ul class="treeview-menu text-center">
+                    <li>
+                        <rzslider ng-init="ctrl.drawing.tools.pen.size = 1.0"
+                                  rz-slider-model="ctrl.drawing.tools.pen.size"
+                                  rz-slider-options="{ floor: 1, ceil: 15 }"/>
+                    </li>
+                    <li>
+                        <div colorpicker
+                             ng-style="{ 'background-color': ctrl.drawing.tools.pen.color || '#000000' }"
+                             ng-model="ctrl.drawing.tools.pen.color">&nbsp;</div>
+                    </li>
+                </ul>
+            </li>
+
             <li>
                 <a href="" ng-click="ctrl.sketch.showGrid = !ctrl.sketch.showGrid">
                     <i ng-show="ctrl.sketch.showGrid" class="text-success fa fa-eye"></i>

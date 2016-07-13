@@ -16,6 +16,7 @@ class Sketch {
     var activeLayer: Long? = null
     var showGrid: Boolean? = true
     var layers: MutableList<Layer>? = mutableListOf()
+    var tools: Tools = Tools()
 }
 
 class Layer {
@@ -28,6 +29,11 @@ class Layer {
 
 class Line {
     var points: MutableList<Array<Int>>? = mutableListOf()
+    var tools: Tools = Tools()
+}
+
+class Tools {
+    var pen: MutableMap<String, Object> = mutableMapOf()
 }
 
 class SketchInfo {
