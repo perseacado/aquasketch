@@ -256,7 +256,7 @@
                         var dxl = x2 - x1;
                         var dyl = y2 - y1;
                         var cross = dxc * dyl - dyc * dxl;
-                        if (Math.abs(cross) > 50.0)
+                        if (Math.abs(cross) > 150.0)
                             return false;
                         if (Math.abs(dxl) >= Math.abs(dyl))
                             return dxl > 0 ?
