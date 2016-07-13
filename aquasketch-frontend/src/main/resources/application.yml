@@ -2,6 +2,9 @@ spring:
   thymeleaf:
     cache: false
 
+multipart:
+  max-file-size: 5Mb
+
 facebook:
   client:
     accessTokenUri: https://graph.facebook.com/oauth/access_token

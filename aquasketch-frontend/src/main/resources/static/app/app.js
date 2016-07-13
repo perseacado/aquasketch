@@ -50,7 +50,7 @@
     'use strict';
 
     angular.module('aquasketch.app')
-        .controller('SketchController', function ($scope, sketch, SketchService) {
+        .controller('SketchController', function ($scope, sketch, SketchService, Upload) {
             var ctrl = this;
 
             ctrl.drawing = sketch;
@@ -97,20 +97,19 @@
 
             ctrl.addImage = function (file) {
                 if (file) {
-                    var img = new Image;
-                    var canvas = document.getElementById('canvas-helper');
-                    var ctx = canvas.getContext('2d');
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    img.onload = function () {
-                        $scope.$apply(function () {
-                            var layer = _.find(ctrl.sketch.layers, {id: ctrl.sketch.activeLayer});
-                            var ratio = img.height / img.width;
-                            ctx.drawImage(img, 0, 0, canvas.width, canvas.width * ratio);
-                            layer.data = layer.data || [];
-                            layer.data.push(canvas.toDataURL("image/png"));
-                        });
-                    }
-                    img.src = URL.createObjectURL(file);
+                    Upload.upload({
+                        url: 'api/media',
+                        data: {file: file}
+                    }).then(function (resp) {
+                        var layer = _.find(ctrl.sketch.layers, {id: ctrl.sketch.activeLayer});
+                        layer.data = layer.data || [];
+                        layer.data.push(resp.data.id);
+                    }, function (resp) {
+                        console.log('Error status: ' + resp.status);
+                    }, function (evt) {
+                        var progressPercentage = parseInt(100.0 * evt.loaded / evt.total);
+                        console.log('progress: ' + progressPercentage + '% ' + evt.config.data.file.name);
+                    });
                 }
             };
 
@@ -311,10 +310,15 @@
                         });
                     }, 100);
 
+                    var layer = function () {
+                        return _.find(scope.drawing.layers, {id: scope.drawing.activeLayer});
+                    };
+
                     var layer_img_tmp = {};
                     var repaint_layer = function (layer) {
                         var layer_ctx = getCanvas(layer);
                         var ctx = layer_ctx.ctx;
+                        var canvas_img = layer_ctx.img.canvas;
                         var ctx_img = layer_ctx.img.ctx;
                         ctx.clearRect(0, 0, width, height);
                         if (!layer.visible) {
@@ -327,9 +331,10 @@
                                 _.forEach(layer.data || [], function (data) {
                                     var image = new Image();
                                     image.onload = function () {
-                                        ctx_img.drawImage(image, 0, 0);
+                                        var ratio = image.height / image.width;
+                                        ctx_img.drawImage(image, 0, 0, canvas_img.width, canvas_img.width * ratio);
                                     };
-                                    image.src = layer.data;
+                                    image.src = '/api/media/' + data;
                                 });
                                 layer_img_tmp[layer.id] = angular.copy(layer.data);
                             }
@@ -384,6 +389,11 @@
                         repaint_layer(layer());
                         // });
                     };
+
+                    _.forEach(scope.drawing.layers, function (layer) {
+                        repaint_layer(layer);
+                    });
+
                     scope.$watch('drawing', function (sketch) {
                         var layer_ids = _.map(sketch.layers, 'id');
                         _.forEach(layer_canvas, function (lc, id) {
@@ -394,10 +404,6 @@
                         });
                         repaint();
                     }, true);
-
-                    var layer = function () {
-                        return _.find(scope.drawing.layers, {id: scope.drawing.activeLayer});
-                    };
 
                     var mouseDown = false;
                     var startX, startY, lastX, lastY;
