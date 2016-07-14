@@ -13,7 +13,7 @@
             </li>
 
             <li class="active treeview">
-                <a>
+                <a href="">
                     <i class="fa fa-list"></i> <span>Layers</span>
                 </a>
                 <ul class="treeview-menu">
@@ -39,38 +39,64 @@
             </li>
 
             <li class="active treeview">
-                <a>Pen</a>
+                <a href=""><i class="fa fa-paint-brush"></i>
+                    Pen
+                    <span class="pull-right">
+                        <i class="fa fa-toggle-on text-success" ng-hide="ctrl.sketch.eraser"></i>
+                        <i class="fa fa-toggle-off" ng-show="ctrl.sketch.eraser"></i>
+                    </span>
+                </a>
                 <ul class="treeview-menu text-center">
                     <li>
-                        <rzslider rz-slider-model="ctrl.drawing.tools.pen.size"
-                                  rz-slider-options="{ floor: 1, ceil: 15 }"/>
+                        <a>
+                            <rzslider rz-slider-model="ctrl.drawing.tools.pen.size"
+                                      rz-slider-options="{ floor: 1, ceil: 15 }"/>
+                        </a>
                     </li>
                     <li>
+                        <a>
                         <div colorpicker
                              ng-style="{ 'background-color': ctrl.drawing.tools.pen.color || '#000000' }"
                              ng-model="ctrl.drawing.tools.pen.color">&nbsp;</div>
+                        </a>
                     </li>
                 </ul>
             </li>
 
-            <li>
-                <a href="" ng-click="ctrl.sketch.showGrid = !ctrl.sketch.showGrid">
-                    <i ng-show="ctrl.sketch.showGrid" class="text-success fa fa-eye"></i>
-                    <i ng-hide="ctrl.sketch.showGrid" class="text-muted fa fa-eye-slash"></i>
-                    <span ng-show="ctrl.sketch.showGrid">Hide grid</span>
-                    <span ng-hide="ctrl.sketch.showGrid">Show grid</span>
+            <li ng-class="{ 'active': ctrl.sketch.eraser }">
+                <a href="" ng-click="ctrl.sketch.eraser = !ctrl.sketch.eraser">
+                    <i class="fa fa-eraser"></i> Eraser
+
+                    <span class="pull-right">
+                        <i class="fa fa-toggle-on text-success" ng-show="ctrl.sketch.eraser"></i>
+                        <i class="fa fa-toggle-off" ng-hide="ctrl.sketch.eraser"></i>
+                    </span>
                 </a>
             </li>
+
             <li>
-                <a href="" ng-click="ctrl.resetSketch()"><span>Reset</span></a>
+                <a href="" ng-click="ctrl.sketch.showGrid = !ctrl.sketch.showGrid">
+                    <i class="fa fa-table"></i> Grid
+                    <span class="pull-right">
+                        <i class="fa fa-toggle-on text-success" ng-show="ctrl.sketch.showGrid"></i>
+                        <i class="fa fa-toggle-off" ng-hide="ctrl.sketch.showGrid"></i>
+                    </span>
+                </a>
             </li>
             <li>
                 <a href="" ngf-select="ctrl.addImage($file)"><i class="fa fa-picture-o"></i> Add Image</a>
             </li>
-            <li ng-class="{ 'active': ctrl.sketch.eraser }">
-                <a href="" ng-click="ctrl.sketch.eraser = !ctrl.sketch.eraser">
-                    <i class="fa fa-eraser" ng-class="{ 'text-success': ctrl.sketch.eraser }"></i> Eraser
+            <li>
+                <a href="" ng-click="ctrl.fullscreen.toggle()">
+                    <i class="fa fa-television"></i> Fullscreen
+                    <span class="pull-right">
+                        <i class="fa fa-toggle-on text-success" ng-show="ctrl.fullscreen.enabled()"></i>
+                        <i class="fa fa-toggle-off" ng-hide="ctrl.fullscreen.enabled()"></i>
+                    </span>
                 </a>
+            </li>
+            <li>
+                <a href="" ng-click="ctrl.resetSketch()"><i class="fa fa-trash"></i> <span>Reset</span></a>
             </li>
         </ul>
     </section>

@@ -53,7 +53,7 @@
     'use strict';
 
     angular.module('aquasketch.app')
-        .controller('SketchController', function ($scope, sketch, SketchService, Upload) {
+        .controller('SketchController', function ($scope, sketch, SketchService, Upload, Utils) {
             var ctrl = this;
 
             ctrl.drawing = sketch;
@@ -116,6 +116,8 @@
                 }
             };
 
+            ctrl.fullscreen = Utils.fullscreen;
+
             $scope.$watch(function () {
                 return sketch;
             }, _.debounce(function (drawing) {
@@ -137,12 +139,26 @@
         });
 })(window.angular);
 
-(function (angular) {
+(function (angular, screenfull) {
     'use strict';
 
     angular.module('aquasketch.services', ['LocalStorageModule'])
         .config(function (localStorageServiceProvider) {
             localStorageServiceProvider.setPrefix('aquasketch');
+        })
+        .service('Utils', function ($document) {
+            var target = $document.find('app-content')[0];
+            this.fullscreen = {
+                toggle: function () {
+                    if (screenfull.enabled) {
+                        screenfull.toggle(target);
+                    }
+                }
+                ,
+                enabled: function () {
+                    return screenfull.enabled && screenfull.isFullscreen;
+                }
+            }
         })
         .service('SketchService', function ($http, localStorageService) {
             this.createSketch = function () {
@@ -167,7 +183,8 @@
                 localStorageService.set(sketch.id, sketch);
             };
         });
-})(window.angular);
+})
+(window.angular, window.screenfull);
 
 
 (function (angular) {
@@ -274,7 +291,8 @@
                         // console.log("delete points");
                         var newLines = [];
                         var currentLine = {
-                            points: []
+                            points: [],
+                            tools: angular.copy(line.tools)
                         };
                         newLines.push(currentLine);
                         for (var i = 0; i < line.points.length; i++) {
@@ -284,7 +302,8 @@
                                     (x1 + x2) / 2, (y1 + y2) / 2)) {
                                 currentLine.points.push(line.points[i])
                                 currentLine = {
-                                    points: []
+                                    points: [],
+                                    tools: angular.copy(line.tools)
                                 };
                                 newLines.push(currentLine);
                             } else {
